@@ -39,29 +39,35 @@ func TestParseResult(t *testing.T) {
 	_, err := ParseResult([]string{})
 	defect.Equal(t, err, ErrWrongNumFields)
 
-	result, err := ParseResult([]string{"12132", "56", "F", "1"})
+	result, err := ParseResult([]string{"12132", "56", "f", "All-Stars", "F", "1"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
 		Competition: 56,
+		Lead:        false,
+		Category:    "All-Stars",
 		Result:      0,
 		Points:      1,
 	})
 
-	result, err = ParseResult([]string{"12132", "56", "0", "1"})
+	result, err = ParseResult([]string{"12132", "56", "l", "Novice", "0", "1"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
 		Competition: 56,
+		Lead:        true,
+		Category:    "Novice",
 		Result:      0,
 		Points:      1,
 	})
 
-	result, err = ParseResult([]string{"12132", "56", "1", "10"})
+	result, err = ParseResult([]string{"12132", "56", "f", "Invitational", "1", "10"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
 		Competition: 56,
+		Lead:        false,
+		Category:    "Invitational",
 		Result:      1,
 		Points:      10,
 	})
