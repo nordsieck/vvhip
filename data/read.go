@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	ErrWrongNumFields = defect.Error("Wrong number of fields")
+	ErrWrongNumFields    = defect.Error("Wrong number of fields")
+	ErrInvalidLeadFollow = defect.Error("Invalid lead of follow value")
 
 	layout = "Jan 2006"
 )
@@ -52,11 +53,13 @@ func ParseCompetition(s []string) (*Competition, error) {
 
 type Result struct {
 	Dancer, Competition uint32
+	Lead                bool
+	Category            string
 	Result, Points      uint8
 }
 
 func ParseResult(s []string) (*Result, error) {
-	if len(s) != 4 {
+	if len(s) != 6 {
 		return nil, ErrWrongNumFields
 	}
 	dancer, err := strconv.ParseUint(s[0], 10, 32)
@@ -67,16 +70,29 @@ func ParseResult(s []string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
+	lead := true
+	if s[2] == "f" {
+		lead = false
+	} else if s[2] != "l" {
+		return nil, ErrInvalidLeadFollow
+	}
 	var result uint64
-	if s[2] != "F" {
-		result, err = strconv.ParseUint(s[2], 10, 32)
+	if s[4] != "F" {
+		result, err = strconv.ParseUint(s[4], 10, 32)
 		if err != nil {
 			return nil, err
 		}
 	}
-	points, err := strconv.ParseUint(s[3], 10, 32)
+	points, err := strconv.ParseUint(s[5], 10, 32)
 	if err != nil {
 		return nil, err
 	}
-	return &Result{Dancer: uint32(dancer), Competition: uint32(competition), Result: uint8(result), Points: uint8(points)}, nil
+	return &Result{
+		Dancer:      uint32(dancer),
+		Competition: uint32(competition),
+		Lead:        lead,
+		Category:    s[3],
+		Result:      uint8(result),
+		Points:      uint8(points),
+	}, nil
 }
