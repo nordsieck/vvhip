@@ -34,3 +34,35 @@ func TestParseCompetition(t *testing.T) {
 	})
 
 }
+
+func TestParseResult(t *testing.T) {
+	_, err := ParseResult([]string{})
+	defect.Equal(t, err, ErrWrongNumFields)
+
+	result, err := ParseResult([]string{"12132", "56", "F", "1"})
+	defect.Equal(t, err, nil)
+	defect.Equal(t, *result, Result{
+		Dancer:      12132,
+		Competition: 56,
+		Result:      0,
+		Points:      1,
+	})
+
+	result, err = ParseResult([]string{"12132", "56", "0", "1"})
+	defect.Equal(t, err, nil)
+	defect.Equal(t, *result, Result{
+		Dancer:      12132,
+		Competition: 56,
+		Result:      0,
+		Points:      1,
+	})
+
+	result, err = ParseResult([]string{"12132", "56", "1", "10"})
+	defect.Equal(t, err, nil)
+	defect.Equal(t, *result, Result{
+		Dancer:      12132,
+		Competition: 56,
+		Result:      1,
+		Points:      10,
+	})
+}
