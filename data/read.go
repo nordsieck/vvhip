@@ -14,20 +14,29 @@ const (
 	layout = "Jan 2006"
 )
 
+type Parser interface {
+	Parse([]string) error
+}
+
 type Dancer struct {
 	Number      uint32
 	First, Last string
 }
 
-func ParseDancer(s []string) (*Dancer, error) {
+var _ Parser = &Dancer{}
+
+func (d *Dancer) Parse(s []string) error {
 	if len(s) != 3 {
-		return nil, ErrWrongNumFields
+		return ErrWrongNumFields
 	}
 	num, err := strconv.ParseUint(s[0], 10, 32)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &Dancer{Number: uint32(num), First: s[2], Last: s[1]}, nil
+	d.Number = uint32(num)
+	d.First = s[2]
+	d.Last = s[1]
+	return nil
 }
 
 type Competition struct {
@@ -36,19 +45,25 @@ type Competition struct {
 	Date           time.Time
 }
 
-func ParseCompetition(s []string) (*Competition, error) {
+var _ Parser = &Competition{}
+
+func (c *Competition) Parse(s []string) error {
 	if len(s) != 4 {
-		return nil, ErrWrongNumFields
+		return ErrWrongNumFields
 	}
 	date, err := time.Parse(layout, s[3])
 	if err != nil {
-		return nil, err
+		return err
 	}
 	num, err := strconv.ParseUint(s[0], 10, 32)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &Competition{Number: uint32(num), Name: s[1], Location: s[2], Date: date}, nil
+	c.Number = uint32(num)
+	c.Name = s[1]
+	c.Location = s[2]
+	c.Date = date
+	return nil
 }
 
 type Result struct {
@@ -58,41 +73,42 @@ type Result struct {
 	Result, Points      uint8
 }
 
-func ParseResult(s []string) (*Result, error) {
+var _ Parser = &Result{}
+
+func (r *Result) Parse(s []string) error {
 	if len(s) != 6 {
-		return nil, ErrWrongNumFields
+		return ErrWrongNumFields
 	}
 	dancer, err := strconv.ParseUint(s[0], 10, 32)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	competition, err := strconv.ParseUint(s[1], 10, 32)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	lead := true
 	if s[2] == "f" {
 		lead = false
 	} else if s[2] != "l" {
-		return nil, ErrInvalidLeadFollow
+		return ErrInvalidLeadFollow
 	}
 	var result uint64
 	if s[4] != "F" {
 		result, err = strconv.ParseUint(s[4], 10, 32)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 	points, err := strconv.ParseUint(s[5], 10, 32)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &Result{
-		Dancer:      uint32(dancer),
-		Competition: uint32(competition),
-		Lead:        lead,
-		Category:    s[3],
-		Result:      uint8(result),
-		Points:      uint8(points),
-	}, nil
+	r.Dancer = uint32(dancer)
+	r.Competition = uint32(competition)
+	r.Lead = lead
+	r.Category = s[3]
+	r.Result = uint8(result)
+	r.Points = uint8(points)
+	return nil
 }
