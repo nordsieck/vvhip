@@ -8,10 +8,11 @@ import (
 )
 
 func TestParseDancer(t *testing.T) {
-	_, err := ParseDancer([]string{})
+	dancer := &Dancer{}
+	err := dancer.Parse([]string{})
 	defect.Equal(t, err, ErrWrongNumFields)
 
-	dancer, err := ParseDancer([]string{"12132", "Cohen", "Miles"})
+	err = dancer.Parse([]string{"12132", "Cohen", "Miles"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *dancer, Dancer{
 		Number: 12132,
@@ -21,10 +22,11 @@ func TestParseDancer(t *testing.T) {
 }
 
 func TestParseCompetition(t *testing.T) {
-	_, err := ParseCompetition([]string{})
+	comp := &Competition{}
+	err := comp.Parse([]string{})
 	defect.Equal(t, err, ErrWrongNumFields)
 
-	comp, err := ParseCompetition([]string{"56", "Easter Swing", "Bellevue, WA", "Apr 2015"})
+	err = comp.Parse([]string{"56", "Easter Swing", "Bellevue, WA", "Apr 2015"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *comp, Competition{
 		Number:   56,
@@ -36,10 +38,11 @@ func TestParseCompetition(t *testing.T) {
 }
 
 func TestParseResult(t *testing.T) {
-	_, err := ParseResult([]string{})
+	result := &Result{}
+	err := result.Parse([]string{})
 	defect.Equal(t, err, ErrWrongNumFields)
 
-	result, err := ParseResult([]string{"12132", "56", "f", "All-Stars", "F", "1"})
+	err = result.Parse([]string{"12132", "56", "f", "All-Stars", "F", "1"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
@@ -50,7 +53,7 @@ func TestParseResult(t *testing.T) {
 		Points:      1,
 	})
 
-	result, err = ParseResult([]string{"12132", "56", "l", "Novice", "0", "1"})
+	err = result.Parse([]string{"12132", "56", "l", "Novice", "0", "1"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
@@ -61,7 +64,7 @@ func TestParseResult(t *testing.T) {
 		Points:      1,
 	})
 
-	result, err = ParseResult([]string{"12132", "56", "f", "Invitational", "1", "10"})
+	err = result.Parse([]string{"12132", "56", "f", "Invitational", "1", "10"})
 	defect.Equal(t, err, nil)
 	defect.Equal(t, *result, Result{
 		Dancer:      12132,
